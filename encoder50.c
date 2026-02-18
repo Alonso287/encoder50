@@ -19,7 +19,7 @@ int main(void) {
         return 1;
     }
 
-    printf("Salida: %s\n", salida);
+    printf("Salida:  %s\n", salida);
 
     free(salida);
 
@@ -31,27 +31,33 @@ char *a_base64(char *entrada) {
 
     // Tabla de caracteres Base64
     const char tabla_base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    int len_entrada = strlen(entrada);
+
+    // Calculamos cuántos bits necesitamos para que el bucle de 6 no se salga (múltiplo de 6)
+    int total_bits_reales = len_entrada * 8;
+    int total_bits_bucle = ((total_bits_reales + 5) / 6) * 6;
 
     // Creamos una lista vacía de la longitud de la cadena * 8 para almacenar el binario de toda la cadena
-    int entrada_binario[strlen(entrada) * 8];
+    int *entrada_binario = calloc(total_bits_bucle, sizeof(int));
+    if (entrada_binario == NULL) {
+        return NULL;
+    }
 
     // Almacenar toda la entrada en una lista con el binario de cada caracter
     binario(entrada, entrada_binario);
 
-    // Crear una variable para almacenar la salida
-    int len_salida = ((4 * strlen(entrada) / 3) + 3) & ~3;
+    // Calcula la longitud de la futura cadena en chars, con padding incluido
+    int len_salida = (((4 * strlen(entrada) / 3) + 3) & ~3);
 
-    printf("%d\n", len_salida);
-
-    char *salida = malloc(len_salida + 1);
+    char *salida = calloc(len_salida + 1, sizeof(char));
     if (salida == NULL) {
         return NULL;
     }
 
-    salida[len_salida + 1] = '\0';
+    salida[len_salida] = '\0';
 
     // Cogemos los bits de 6 en 6 y los juntamos para hacer un caracter de la tabla
-    for (int i = 0, len = strlen(entrada) * 8; i < len; i += 6) {
+    for (int i = 0; i < total_bits_bucle; i += 6) {
         // M -> a -> n 
         int indice = 0;
         for (int j = 0; j < 6; j++) {
@@ -61,6 +67,15 @@ char *a_base64(char *entrada) {
         // Usamos el índice para obtener el caracter de la tabla y lo añadimos a la salida
         salida[i / 6] = tabla_base64[indice];
     }
+
+    if (strlen(entrada) % 3 == 1) {
+        salida[len_salida - 1] = '=';
+        salida[len_salida - 2] = '=';
+    }else if (strlen(entrada) % 3 == 2) {
+        salida[len_salida - 1] = '=';
+    }
+
+    free(entrada_binario);
     return salida;
 }
 
