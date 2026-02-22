@@ -1,4 +1,5 @@
 # encoder50: A Base64 encoding and decoding tool
+[![blazingly fast](https://www.blazingly.fast/api/badge.svg?repo=Alonso287%2Fencoder50)](https://www.blazingly.fast)
 #### Video Demo:  [https://youtu.be/8_C2XhbPW6Q)](https://youtu.be/8_C2XhbPW6Q)
 #### Description:
 encoder50 is a command-line interface (CLI) application developed in C that implements the Base64 encoding and decoding algorithms from scratch.
